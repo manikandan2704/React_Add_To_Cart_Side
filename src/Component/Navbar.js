@@ -4,106 +4,137 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const DocumentUpload = () => {
   const [applications, setApplications] = useState(["Application_1"]);
-  const [selectedApplication, setSelectedApplication] = useState("Application_1");
-  const [applicationDocuments, setApplicationDocuments] = useState({
-    Application_1: ["Document_1"],
+
+
+  const [selectapp, setselectapp] = useState();
+
+
+  const [selectappdoc, setselectappdoc] = useState({
+    Application_1: [],
   });
-  const [selectedDocumentIndex, setSelectedDocumentIndex] = useState(0);
+  const [selectdoc, setselectdoc] = useState(0);
 
-  const handleAddApplication = () => {
+  const addfunction = () => {
     const newAppIndex = applications.length + 1;
-    const newApplication = `Application_${newAppIndex}`;
-    setApplications([...applications, newApplication]);
-    setSelectedApplication(newApplication);
 
-    setApplicationDocuments((prev) => ({
+    const newApplication = `Application_${newAppIndex}`;
+
+    setApplications([...applications, newApplication]);
+
+    setselectapp(newApplication);
+
+    setselectappdoc((prev) => ({
       ...prev,
       [newApplication]: [],
     }));
-    setSelectedDocumentIndex(0);
+    setselectdoc(0);
   };
 
-  const handleAddDocument = () => {
-    setApplicationDocuments((prev) => {
+  const adddoc = () => {
+
+    setselectappdoc((prev) => {
+
       const updatedDocs = [
-        ...(prev[selectedApplication] || []),
-        `Document_${(prev[selectedApplication]?.length || 0) + 1}`,
+
+        ...(prev[selectapp] || []),
+
+        `Document_${(prev[selectapp]?.length || 0) + 1}`,
+
       ];
       return {
         ...prev,
-        [selectedApplication]: updatedDocs,
+
+        [selectapp]: updatedDocs,
+
       };
     });
   };
 
-  const handleDeleteApplication = (app) => {
+  const deletebutton = (app) => {
     const updatedApplications = applications.filter((application) => application !== app);
+
     setApplications(updatedApplications);
 
-    setApplicationDocuments((prev) => {
+    setselectappdoc((prev) => {
       const { [app]: _, ...rest } = prev;
       return rest;
     });
 
-    if (app === selectedApplication && updatedApplications.length > 0) {
-      setSelectedApplication(updatedApplications[0]);
-      setSelectedDocumentIndex(0);
+    if (app === selectapp && updatedApplications.length > 0) {
+
+      setselectapp(updatedApplications[0]);
+
+      setselectdoc(0);
+
     } else if (updatedApplications.length === 0) {
-      setSelectedApplication(null);
-      setSelectedDocumentIndex(0);
+
+      setselectapp(null);
+
+      setselectdoc(0);
     }
   };
 
-  const handleDeleteDocument = (doc) => {
-    setApplicationDocuments((prev) => {
-      const updatedDocs = (prev[selectedApplication] || []).filter((document) => document !== doc);
+  const deldoc = (doc) => {
+    setselectappdoc((prev) => {
+      const updatedDocs = (prev[selectapp] || []).filter((document) => document !== doc);
       return {
         ...prev,
-        [selectedApplication]: updatedDocs,
+        [selectapp]: updatedDocs,
       };
     });
 
-    if (applicationDocuments[selectedApplication]?.length === 1) {
-      setSelectedDocumentIndex(0);
+    if (selectappdoc[selectapp]?.length === 1) {
+      setselectdoc(0);
     }
   };
 
-  const handleApplicationClick = (app) => {
-    setSelectedApplication(app);
-    setSelectedDocumentIndex(0);
+  const handle1 = (app) => {
+    setselectapp(app);
+    setselectdoc(0);
   };
 
-  const handleNext = () => {
-    const docs = applicationDocuments[selectedApplication] || [];
-    if (selectedDocumentIndex < docs.length - 1) {
-      setSelectedDocumentIndex(selectedDocumentIndex + 1);
+  const next = () => {
+    const docs = selectappdoc[selectapp] || [];
+
+    if (selectdoc < docs.length - 1) {
+
+      setselectdoc(selectdoc + 1);
     } else {
-      const currentAppIndex = applications.indexOf(selectedApplication);
-      if (currentAppIndex < applications.length - 1) {
-        const nextApp = applications[currentAppIndex + 1];
-        setSelectedApplication(nextApp);
-        setSelectedDocumentIndex(0);
+      const temp1 = applications.indexOf(selectapp);
+
+      if (temp1 < applications.length - 1) {
+
+        const nextApp = applications[temp1 + 1];
+
+        setselectapp(nextApp);
+
+        setselectdoc(0);
       }
     }
   };
 
-  const handleBack = () => {
-    if (selectedDocumentIndex > 0) {
-      setSelectedDocumentIndex(selectedDocumentIndex - 1);
+  const back = () => {
+    if (selectdoc > 0) {
+      setselectdoc(selectdoc - 1); 
     } else {
-      const currentAppIndex = applications.indexOf(selectedApplication);
+      const currentAppIndex = applications.indexOf(selectapp);
       if (currentAppIndex > 0) {
-        const prevApp = applications[currentAppIndex - 1];
-        setSelectedApplication(prevApp);
-        const prevAppDocs = applicationDocuments[prevApp] || [];
-        setSelectedDocumentIndex(prevAppDocs.length - 1);
+        const previousApp = applications[currentAppIndex - 1]; 
+        setselectapp(previousApp);
+  
+        const previousAppDocs = selectappdoc[previousApp] || [];
+        setselectdoc(previousAppDocs.length > 0 ? previousAppDocs.length - 1 : 0); 
       }
     }
   };
+  
 
-  const selectedDocuments = applicationDocuments[selectedApplication] || [];
+  const selectedDocuments = selectappdoc[selectapp] || [];
+
+
+
   const selectedDocument =
-    selectedDocuments.length > 0 ? selectedDocuments[selectedDocumentIndex] : null;
+    selectedDocuments.length > 0 ? selectedDocuments[selectdoc] : null;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", padding: "20px" }}>
@@ -112,10 +143,10 @@ const DocumentUpload = () => {
           {applications.map((app, index) => (
             <div key={index} style={{ display: "inline-flex", alignItems: "center", marginRight: "10px" }}>
               <button
-                onClick={() => handleApplicationClick(app)}
+                onClick={() => handle1(app)}
                 style={{
                   padding: "10px",
-                  backgroundColor: selectedApplication === app ? "#d6d6d6" : "white",
+                  backgroundColor: selectapp === app ? "#d6d6d6" : "white",
                   border: "1px solid #ccc",
                   cursor: "pointer",
                 }}
@@ -124,14 +155,14 @@ const DocumentUpload = () => {
                 <FontAwesomeIcon
                   icon={faTrash}
                   style={{ color: "red", marginLeft: "5px", cursor: "pointer" }}
-                  onClick={() => handleDeleteApplication(app)}
+                  onClick={() => deletebutton(app)}
                 />
               </button>
             </div>
           ))}
         </div>
         <button
-          onClick={handleAddApplication}
+          onClick={addfunction}
           style={{
             backgroundColor: "green",
             color: "white",
@@ -167,15 +198,17 @@ const DocumentUpload = () => {
                   icon={faTrash}
                   style={{ color: "red", marginLeft: "10px", cursor: "pointer" }}
                   onClick={(e) => {
+
                     e.stopPropagation();
-                    handleDeleteDocument(doc);
+
+                    deldoc(doc);
                   }}
                 />
               </button>
             </div>
           ))}
           <button
-            onClick={handleAddDocument}
+            onClick={adddoc}
             style={{
               backgroundColor: "green",
               color: "white",
@@ -192,7 +225,7 @@ const DocumentUpload = () => {
         {selectedDocument && (
           <div style={{ flexGrow: 1, textAlign: "center", border: "1px solid #ccc", padding: "20px" }}>
             <p style={{ marginBottom: "20px" }}>
-              Upload File for {selectedApplication} - {selectedDocument}
+              Upload File for {selectapp} - {selectedDocument}
             </p>
             <input type="file" />
           </div>
@@ -201,18 +234,18 @@ const DocumentUpload = () => {
 
       <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-between" }}>
         <button
-          onClick={handleBack}
+          onClick={back}
           style={{
             padding: "10px",
             border: "1px solid #ccc",
             cursor: "pointer",
           }}
-          disabled={!selectedApplication || selectedDocuments.length === 0}
+          disabled={!selectapp || selectedDocuments.length === 0}
         >
           Back
         </button>
         <button
-          onClick={handleNext}
+          onClick={next}
           style={{
             backgroundColor: "black",
             color: "white",
@@ -220,7 +253,7 @@ const DocumentUpload = () => {
             border: "none",
             cursor: "pointer",
           }}
-          disabled={!selectedApplication || selectedDocuments.length === 0}
+          disabled={!selectapp || selectedDocuments.length === 0}
         >
           Next
         </button>
